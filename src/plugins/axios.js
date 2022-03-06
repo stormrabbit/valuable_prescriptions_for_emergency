@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 // let loadingInstance = null;
 
 const instance = axios.create({
@@ -86,7 +87,7 @@ const request = function (url, params, config, method) {
 }
 
 const post = (url, params = {}, config = {}) => {
-    return request(url, params, config, 'post')
+    return request(url, qs.stringify(params), config, 'post')
 }
 
 const get = (url, query = {}, params, config = {}) => {
@@ -96,12 +97,12 @@ const get = (url, query = {}, params, config = {}) => {
 
 const put = (url, query = {}, params, config = {}) => {
     const _url = `${url}?${parseQuery(query)}`
-    return request(_url, params, config, 'put')
+    return request(_url, qs.stringify(params), config, 'put')
 }
 
 const del = (url, query = {}, config = {}) => {
     const _url = `${url}?${parseQuery(query)}`
-    return request(_url, {}, config, 'put')
+    return request(_url, {}, config, 'delete')
 }
 
 const parseQuery = (query = {}) => {
