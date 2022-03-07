@@ -38,8 +38,19 @@
       </el-form-item>
     </el-form>
     <div>
-      <el-button type="primary" size="medium" @click="toDarhboard">返回</el-button>
-      <el-button v-if="edit" type="primary" size="medium" @click="setPrescription">确定</el-button>
+      <el-button type="primary" size="medium" @click="toDarhboard"
+        >返回</el-button
+      >
+      <el-button v-if="!edit" type="primary" size="medium" @click="toUpdate"
+        >修改</el-button
+      >
+      <el-button
+        v-if="edit"
+        type="primary"
+        size="medium"
+        @click="setPrescription"
+        >确定</el-button
+      >
     </div>
   </div>
 </template>
@@ -50,7 +61,11 @@ import ElFormItem from "element-ui/lib/form-item";
 import ElInput from "element-ui/lib/input";
 import ElButton from "element-ui/lib/button";
 import VpfeInput from "../components/VpfeInput.vue";
-import { createPrescription, retrievePrescriptionById, updatePrescriptionById } from "../api";
+import {
+  createPrescription,
+  retrievePrescriptionById,
+  updatePrescriptionById,
+} from "../api";
 export default {
   name: "Detailboard",
   components: {
@@ -60,15 +75,7 @@ export default {
     ElButton,
     VpfeInput,
   },
-  async mounted() {
-    const { id, edit } = this.$route.query;
-    if (id) {
-      this.prescriptionObj = await retrievePrescriptionById(id);
-    }
-    if (edit) {
-      this.edit = Boolean(parseInt(edit));
-    }
-  },
+  async mounted() {},
   data: () => ({
     edit: false,
     prescriptionObj: {
@@ -79,18 +86,61 @@ export default {
       detail: "",
     },
   }),
-  methods: {
-      toDarhboard() {
-          this.$router.push({path: '/', query: {
-              t: new Date().getTime()
-          }})
+  watch: {
+    "$route.query": {
+      async handler({ id, edit }) {
+        if (id) {
+          this.prescriptionObj = await retrievePrescriptionById(id);
+        }
+        if (edit) {
+          this.edit = Boolean(parseInt(edit));
+        }
       },
-      async setPrescription() {
-           const { id } = this.$route.query;
-           const result = !id ? createPrescription(this.prescriptionObj) : updatePrescriptionById(id, this.prescriptionObj);
-           console.log(result)
+      immediate: true,
+      deep: true,
+    },
+  },
+  methods: {
+    toDarhboard() {
+      this.$router.push({
+        path: "/",
+        query: {
+          t: new Date().getTime(),
+        },
+      });
+    },
+    toUpdate() {
+      this.$router.push({
+        path: "/detailboard",
+        query: {
+          t: new Date().getTime(),
+          id: this?.$route?.query?.id || "",
+          edit: 1,
+        },
+      });
+    },
+    async setPrescription() {
+      const { id } = this.$route.query;
+      const result = !id
+        ? await createPrescription(this.prescriptionObj)
+        : await updatePrescriptionById(id, this.prescriptionObj);
+      const { _id: pid } = result;
+      if (!id) {
+        this.toDarhboard();
       }
-  }
+      if (id === pid) {
+        this.$router.push({
+          path: "/detailboard",
+          query: {
+            t: new Date().getTime(),
+            id: this?.$route?.query?.id || "",
+            edit: 0,
+          },
+        });
+      }
+      console.log(result);
+    },
+  },
 };
 </script>
 

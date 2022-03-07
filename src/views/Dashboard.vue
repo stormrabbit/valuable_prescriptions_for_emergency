@@ -7,22 +7,22 @@
         class="vpfe-dashboard-title_search"
       >
         <el-form-item class="vpfe-dashboard-title_search_item" label="疾病搜索">
-          <el-input v-model="searchObj.disease"></el-input>
+          <el-input v-model="searchObj.disease" clearable @clear="handleClear('disease')"></el-input>
         </el-form-item>
         <el-form-item class="vpfe-dashboard-title_search_item" label="症状搜索">
-          <el-input v-model="searchObj.symptom"></el-input>
+          <el-input v-model="searchObj.symptom" clearable @clear="handleClear('symptom')"></el-input>
         </el-form-item>
         <el-form-item class="vpfe-dashboard-title_search_item" label="药方搜索">
-          <el-input v-model="searchObj.prescriptionName"></el-input>
+          <el-input v-model="searchObj.prescriptionName" clearable @clear="handleClear('prescriptionName')"></el-input>
         </el-form-item>
         <el-form-item
           class="vpfe-dashboard-title_search_item"
           label="治疗方式搜索"
         >
-          <el-input v-model="searchObj.treatment"></el-input>
+          <el-input v-model="searchObj.treatment" clearable  @clear="handleClear('treatment')"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" size="medium">查询</el-button>
+      <el-button type="primary" size="medium" @click="toSearch">查询</el-button>
       <el-button type="primary" size="medium" @click="toDetail({}, 1)">新建</el-button>
     </div>
 
@@ -30,7 +30,7 @@
       <template v-slot="{ row, column }">
         <p v-if="column.property === 'op'">
           <el-button @click="toDetail(row)">查看</el-button>
-          <el-button @click="toDetail(row, 1)">编辑</el-button>
+          <!-- <el-button @click="toDetail(row, 1)">编辑</el-button> -->
            <el-button @click="removePrescription(row)">删除</el-button>
         </p>
         <p v-else-if="Array.isArray(row[column.property])">
@@ -67,9 +67,9 @@ export default {
     ElTag,
   },
   mounted() {
-    this.retrievePrescriptions()  
   },
   data: () => ({
+    currentPage:1,
     searchObj: {
       prescriptionName: "",
       disease: "",
@@ -86,7 +86,59 @@ export default {
     ],
     tableData: [],
   }),
+  watch: {
+    '$route.query': {
+      handler(newQuery) {
+        console.log(newQuery)
+        const {
+          prescriptionName='',
+          disease = '',
+          symptom = '',
+          treatment = ''
+        } = newQuery
+        this.searchObj = {
+          prescriptionName,
+          disease,
+          symptom,
+          treatment,
+        }
+        this.retrievePrescriptions(this.searchObj)
+      },
+      deep: true,
+      immediate:true
+    },
+  },
   methods: {
+    handleClear(propName='') {
+      if(!propName) {
+        return
+      }
+      const {
+        query = {}
+      } = this.$route;
+      const newQuery = Object.assign({}, query, {
+          [propName]:'',
+          page:1,
+          pageSize: 10,
+          t:new Date().getTime()
+        })
+      this.$router.push({
+        path: '/',
+        query: newQuery
+      })
+    },
+    toSearch() {
+      console.log(this.searchObj)
+      this.$router.push({
+        path: '/',
+        query: {
+          page:1,
+          pageSize:10,
+          ...this.searchObj,
+          t:new Date().getTime()
+        }
+      })
+    },
     toDetail(row, isEdit = 0) {
       this.$router.push({
         path: '/detailboard',
@@ -100,12 +152,18 @@ export default {
     },
     async removePrescription({'_id':id}) {
       await removePrescriptionById(id)
-      await this.retrievePrescriptions()
+      this.$router.push({path: '/', query: {
+         t: new Date().getTime()
+      }})
     },
-    async retrievePrescriptions() {
+    async retrievePrescriptions(query) {
        const {
       list=[]
-    } = await retrievePrescriptions()
+    } = await retrievePrescriptions({
+      ...query,
+      pageSize:10,
+      page: this.currentPage
+    })
     this.tableData = list;
     console.log(list)
     }
