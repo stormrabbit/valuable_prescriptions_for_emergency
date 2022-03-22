@@ -3,28 +3,28 @@
     <el-form label-position="left" label-width="80px" :model="prescriptionObj">
       <el-form-item label="药方名称">
         <el-input
-          v-model="prescriptionObj.prescriptionName"
+          v-model.trim="prescriptionObj.prescriptionName"
           :readonly="!edit"
         ></el-input>
       </el-form-item>
       <el-form-item label="治疗疾病">
         <!-- <el-input v-model="prescriptionObj.disease"></el-input> -->
         <vpfe-input
-          v-model="prescriptionObj.disease"
+          v-model.trim="prescriptionObj.disease"
           :editModel="edit"
         ></vpfe-input>
       </el-form-item>
       <el-form-item label="对应症状">
         <!-- <el-input v-model="prescriptionObj.symptom/"></el-input> -->
         <vpfe-input
-          v-model="prescriptionObj.symptom"
+          v-model.trim="prescriptionObj.symptom"
           :editModel="edit"
         ></vpfe-input>
       </el-form-item>
       <el-form-item label="治疗方式">
         <!-- <el-input v-model="prescriptionObj.treatment"></el-input> -->
         <vpfe-input
-          v-model="prescriptionObj.treatment"
+          v-model.trim="prescriptionObj.treatment"
           :editModel="edit"
         ></vpfe-input>
       </el-form-item>

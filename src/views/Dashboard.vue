@@ -8,21 +8,21 @@
       >
         <el-form-item class="vpfe-dashboard-title_search_item" label="疾病搜索">
           <el-input
-            v-model="searchObj.disease"
+            v-model.trim="searchObj.disease"
             clearable
             @clear="handleClear('disease')"
           ></el-input>
         </el-form-item>
         <el-form-item class="vpfe-dashboard-title_search_item" label="症状搜索">
           <el-input
-            v-model="searchObj.symptom"
+            v-model.trim="searchObj.symptom"
             clearable
             @clear="handleClear('symptom')"
           ></el-input>
         </el-form-item>
         <el-form-item class="vpfe-dashboard-title_search_item" label="药方搜索">
           <el-input
-            v-model="searchObj.prescriptionName"
+            v-model.trim="searchObj.prescriptionName"
             clearable
             @clear="handleClear('prescriptionName')"
           ></el-input>
@@ -32,7 +32,7 @@
           label="治疗方式搜索"
         >
           <el-input
-            v-model="searchObj.treatment"
+            v-model.trim="searchObj.treatment"
             clearable
             @clear="handleClear('treatment')"
           ></el-input>
@@ -123,7 +123,6 @@ export default {
   watch: {
     "$route.query": {
       handler(newQuery) {
-        console.log(newQuery);
         const {
           prescriptionName = "",
           disease = "",

@@ -16,7 +16,7 @@
       <el-input
         class="input-new-tag"
         v-if="inputVisible"
-        v-model="inputValue"
+        v-model.trim="inputValue"
         ref="saveTagInput"
         size="small"
         @keyup.enter.native="handleInputConfirm"
