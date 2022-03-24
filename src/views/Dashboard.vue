@@ -27,21 +27,25 @@
             @clear="handleClear('prescriptionName')"
           ></el-input>
         </el-form-item>
-        <el-form-item
-          class="vpfe-dashboard-title_search_item"
-          label="治疗方式搜索"
-        >
+        <el-form-item class="vpfe-dashboard-title_search_item" label="方式搜索">
           <el-input
             v-model.trim="searchObj.treatment"
             clearable
             @clear="handleClear('treatment')"
           ></el-input>
         </el-form-item>
+        <div class="vpfe-dashboard-title_search_op">
+          <el-button type="primary" size="medium" @click="toSearch"
+            >查询</el-button
+          >
+          <el-button type="primary" size="medium" @click="toDetail({}, 1)"
+            >新建</el-button
+          >
+          <el-checkbox v-model="searchObj.favorite"
+            >已收藏</el-checkbox
+          >
+        </div>
       </el-form>
-      <el-button type="primary" size="medium" @click="toSearch">查询</el-button>
-      <el-button type="primary" size="medium" @click="toDetail({}, 1)"
-        >新建</el-button
-      >
     </div>
 
     <vpfe-table
@@ -52,8 +56,12 @@
       <template v-slot="{ row, column }">
         <p v-if="column.property === 'op'">
           <el-button @click="toDetail(row)">查看</el-button>
-          <!-- <el-button @click="toDetail(row, 1)">编辑</el-button> -->
           <el-button @click="removePrescription(row)">删除</el-button>
+          <el-button @click="addToFavorite(row)">收藏</el-button>
+        </p>
+        <p v-else-if="column.property === 'prescriptionName'">
+          <i class="el-icon-star-off"></i>
+          <span style="margin-left: 8px">{{ row.prescriptionName }}</span>
         </p>
         <p v-else-if="Array.isArray(row[column.property])">
           <el-tag
@@ -89,6 +97,7 @@ import ElInput from "element-ui/lib/input";
 import ElForm from "element-ui/lib/form";
 import ElFormItem from "element-ui/lib/form-item";
 import ElTag from "element-ui/lib/tag";
+import ElCheckbox from "element-ui/lib/checkbox";
 import { removePrescriptionById, retrievePrescriptions } from "../api/index";
 export default {
   components: {
@@ -99,6 +108,7 @@ export default {
     ElFormItem,
     ElTag,
     ElPagination,
+    ElCheckbox,
   },
   mounted() {},
   data: () => ({
@@ -128,7 +138,7 @@ export default {
           disease = "",
           symptom = "",
           treatment = "",
-          page ,
+          page,
         } = newQuery;
         this.searchObj = {
           prescriptionName,
@@ -213,6 +223,9 @@ export default {
       this.total = totalPage;
     },
   },
+  addToFavorite(row) {
+    console.log(row);
+  },
 };
 </script>
 
@@ -226,7 +239,10 @@ export default {
   margin-bottom: 22px;
 }
 .vpfe-dashboard-title_search {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(40px, 40px);
   flex: 1;
 }
 .vpfe-dashboard-title_search .el-form-item {
@@ -243,5 +259,15 @@ export default {
 }
 .vpfe-dashboard-title_search_item_label {
   margin-right: 8px;
+}
+.vpfe-dashboard-title_search_op {
+  display: flex;
+  align-items: center;
+}
+
+.vpfe-dashboard-title_search_op .el-checkbox {
+  margin:0 10px;
+  line-height: 0;
+  border-radius: 4px;
 }
 </style>
